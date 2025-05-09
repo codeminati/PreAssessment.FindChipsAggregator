@@ -1,84 +1,99 @@
-Objective:
-Scrape offer data for the electronic part “2N222” from FindChips (https://www.findchips.com), focusing on extracting structured offer information from up to 5 distributors.
+FindChips Distributor Data Aggregation Tool
 
-Data to Extract:
+Objective:
+Scrape distributor offers from FindChips for a specific part number (“2N222”), and export structured results to Excel. Test ability to work with external sites, asynchronous programming, and data export.
+
+Features:
+
+Retrieves offers from up to 5 distributors
+
+Extracts key fields per offer:
 
 Distributor Name
 
-Seller Name (if available)
+Seller Name
 
-MOQ (Minimum Order Quantity)
+MOQ
 
-SPQ (not provided, use 0 as default)
+SPQ (if not found, default to 0)
 
 Unit Price
 
 Currency
 
+Offer URL (if available)
+
 Timestamp
 
-Offer URL (not available, leave as empty string)
+Technologies:
 
-Tech Stack:
+.NET Core or .NET 6/8 Console App
 
-.NET 6 or above
+HtmlAgilityPack for scraping
 
-HtmlAgilityPack
+Newtonsoft.Json for parsing embedded JSON
 
-Newtonsoft.Json
+ClosedXML for Excel export
 
-Folder Structure:
-PreAssessment.FindChipsAggregator/
+Asynchronous HTTP with HttpClient
 
-Models/
+Steps:
 
-DistributorOffer.cs
+Make an HTTP GET request to: https://www.findchips.com/search/2N222
 
-Services/
+Parse HTML using HtmlAgilityPack
 
-FindChipsScraper.cs
+Extract offer rows containing data-id and data-price attributes
 
-Program.cs
+Decode and deserialize JSON price entries
 
-How It Works:
+Store results in a list of custom objects
 
-Sends an HTTP GET request to https://www.findchips.com/search/2N222.
+Export to Excel using ClosedXML
 
-Parses the HTML using HtmlAgilityPack.
+Asynchronous Handling:
 
-For each offer row with "data-id":
+All web requests and parsing are performed asynchronously
 
-Extracts JSON string from the "data-price" attribute.
+Resilient to timeouts and partial failures
 
-Decodes HTML-encoded characters.
+Excel Output Columns:
 
-Parses into a list of price tiers.
+DistributorName
 
-Creates DistributorOffer objects for each tier.
+SellerName
 
-Edge Case Handling:
+MOQ
 
-Handles malformed JSON by decoding HTML entities.
+SPQ
 
-Missing or invalid values are skipped or defaulted.
+UnitPrice
 
-Errors in processing individual rows don’t stop execution.
+Currency
 
-Example Usage:
-var scraper = new FindChipsScraper();
-var offers = await scraper.GetDistributorOffersAsync("2N222");
+OfferUrl
+
+Timestamp
 
 Example Output:
-[
-{
-"DistributorName": "Mouser",
-"SellerName": "ON Semi",
-"MOQ": 100,
-"SPQ": 0,
-"UnitPrice": 0.35,
-"Currency": "USD",
-"OfferUrl": "",
-"Timestamp": "2025-05-09T12:30:00"
-}
-]
+Distributor: Mouser
+MOQ: 100
+Price: 32.00
+Currency: INR
+Timestamp: 2025-05-09 14:00:00
 
+Testing Instructions:
+
+Run from console
+
+Open Excel file to verify structure
+
+Validate prices, fields, and formatting
+
+Edge Cases:
+
+Missing JSON or malformed price list skipped
+
+Duplicate entries avoided
+
+Fails gracefully if site structure changes
